@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/database.js';
+import User from './models/User.js';
 
 // Import Routes
 import authRoutes from './routes/auth.js';
@@ -15,8 +16,34 @@ import settingsRoutes from './routes/settings.js';
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB and create admin user
+const initializeServer = async () => {
+    await connectDB();
+
+    // Auto-create admin user if doesn't exist
+    try {
+        const existingAdmin = await User.findOne({ email: 'admin@currycrave.com' });
+        if (!existingAdmin) {
+            const adminUser = new User({
+                name: 'Admin',
+                email: 'admin@currycrave.com',
+                password: 'admin123',
+                phone: '9999999999',
+                role: 'admin'
+            });
+            await adminUser.save();
+            console.log('✅ Admin user created automatically!');
+            console.log('📧 Email: admin@currycrave.com');
+            console.log('🔑 Password: admin123');
+        } else {
+            console.log('✅ Admin user already exists');
+        }
+    } catch (error) {
+        console.log('⚠️ Could not auto-create admin:', error.message);
+    }
+};
+
+initializeServer();
 
 // Initialize Express app
 const app = express();
@@ -86,3 +113,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });
+
