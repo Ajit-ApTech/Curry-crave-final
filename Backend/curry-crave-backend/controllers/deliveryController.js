@@ -257,16 +257,18 @@ export const validatePincode = async (req, res) => {
 
         const isDeliverable = nearestDistance <= deliveryRadius;
 
+        const locationLabel = nearestLocation.name || nearestLocation.area || nearestLocation.pincode || 'Restaurant';
+
         return res.json({
             success: true,
             deliverable: isDeliverable,
             message: isDeliverable
-                ? `Great! We deliver to ${customerCoords.area} (${nearestDistance} KM from ${nearestLocation.name || nearestLocation.area})`
-                : `Sorry, ${customerCoords.area} is ${nearestDistance} KM away. We deliver within ${deliveryRadius} KM only.`,
+                ? `Great! We deliver to ${customerCoords.area} (${nearestDistance} KM from ${locationLabel})`
+                : `Sorry, ${customerCoords.area} is ${nearestDistance} KM away from ${locationLabel}. We deliver within ${deliveryRadius} KM only.`,
             area: customerCoords.area,
             city: customerCoords.city,
             distance: nearestDistance,
-            nearestLocation: nearestLocation.name || nearestLocation.area,
+            nearestLocation: locationLabel,
             deliveryRadius: deliveryRadius,
             source: 'calculated'
         });
