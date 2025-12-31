@@ -164,3 +164,40 @@ export const getSpecialFoods = async (req, res) => {
         });
     }
 };
+
+// @desc    Upload food item image
+// @route   POST /api/food/upload-image
+// @access  Private/Admin
+export const uploadFoodImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please upload an image file'
+            });
+        }
+
+        // When using Cloudinary storage, the file object contains the Cloudinary URL
+        const imageUrl = req.file.path || req.file.secure_url || req.file.url;
+
+        if (!imageUrl) {
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to upload image. Please check Cloudinary configuration.'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Image uploaded successfully',
+            imageUrl: imageUrl,
+            publicId: req.file.filename || req.file.public_id
+        });
+    } catch (error) {
+        console.error('Image upload error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error uploading image: ' + error.message
+        });
+    }
+};

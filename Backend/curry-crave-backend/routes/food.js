@@ -5,9 +5,11 @@ import {
     createFood,
     updateFood,
     deleteFood,
-    getSpecialFoods
+    getSpecialFoods,
+    uploadFoodImage
 } from '../controllers/foodController.js';
 import { protect, admin } from '../middleware/auth.js';
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
@@ -20,5 +22,8 @@ router.get('/:id', getFoodById);
 router.post('/', protect, admin, createFood);
 router.put('/:id', protect, admin, updateFood);
 router.delete('/:id', protect, admin, deleteFood);
+
+// Image upload route
+router.post('/upload-image', protect, admin, upload.single('image'), uploadFoodImage);
 
 export default router;

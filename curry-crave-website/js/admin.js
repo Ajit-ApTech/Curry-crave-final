@@ -1137,6 +1137,7 @@ async function loadMenuData() {
 }
 
 let editingItemId = null;
+let uploadedImageUrl = null;
 
 function openMenuModal(itemId = null) {
     const modal = document.getElementById('menuItemModal');
@@ -1144,6 +1145,7 @@ function openMenuModal(itemId = null) {
     const form = document.getElementById('menuItemForm');
 
     form.reset();
+    resetImageUpload();
 
     if (itemId) {
         editingItemId = itemId;
@@ -1159,6 +1161,12 @@ function openMenuModal(itemId = null) {
             document.getElementById('itemRating').value = item.rating || 0;
             document.getElementById('itemPrepTime').value = item.preparationTime || 30;
             document.getElementById('itemAvailability').checked = item.isAvailable !== false;
+
+            // Show existing image if available
+            if (item.image) {
+                showImagePreview(item.image, 'Current image');
+                uploadedImageUrl = item.image;
+            }
         }
     } else {
         editingItemId = null;
@@ -1168,6 +1176,7 @@ function openMenuModal(itemId = null) {
         document.getElementById('itemPrepTime').value = 30;
     }
 
+    setupImageUploadListeners();
     modal.classList.add('active');
 }
 
@@ -1175,7 +1184,164 @@ function closeMenuModal() {
     const modal = document.getElementById('menuItemModal');
     modal.classList.remove('active');
     editingItemId = null;
+    uploadedImageUrl = null;
     document.getElementById('menuItemForm').reset();
+    resetImageUpload();
+}
+
+// Image Upload Functions
+function setupImageUploadListeners() {
+    const container = document.getElementById('imageUploadContainer');
+    const fileInput = document.getElementById('itemImageFile');
+    const useUrlCheckbox = document.getElementById('useUrlInstead');
+    const urlInput = document.getElementById('itemImageUrl');
+    const removeBtn = document.getElementById('removeImageBtn');
+
+    // Click to upload
+    container.onclick = (e) => {
+        if (e.target.id !== 'removeImageBtn' && !e.target.closest('#removeImageBtn') && !useUrlCheckbox.checked) {
+            fileInput.click();
+        }
+    };
+
+    // File selection
+    fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            await handleImageUpload(file);
+        }
+    };
+
+    // Drag and drop
+    container.ondragover = (e) => {
+        e.preventDefault();
+        container.style.borderColor = 'var(--primary-gold)';
+        container.style.background = 'rgba(212, 175, 55, 0.1)';
+    };
+
+    container.ondragleave = (e) => {
+        e.preventDefault();
+        container.style.borderColor = 'rgba(212, 175, 55, 0.5)';
+        container.style.background = 'transparent';
+    };
+
+    container.ondrop = async (e) => {
+        e.preventDefault();
+        container.style.borderColor = 'rgba(212, 175, 55, 0.5)';
+        container.style.background = 'transparent';
+
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            await handleImageUpload(file);
+        }
+    };
+
+    // Toggle URL input
+    useUrlCheckbox.onchange = () => {
+        if (useUrlCheckbox.checked) {
+            urlInput.style.display = 'block';
+            container.style.display = 'none';
+        } else {
+            urlInput.style.display = 'none';
+            container.style.display = 'block';
+        }
+    };
+
+    // URL input change
+    urlInput.oninput = () => {
+        const url = urlInput.value.trim();
+        if (url) {
+            document.getElementById('itemImage').value = url;
+            uploadedImageUrl = url;
+        }
+    };
+
+    // Remove image
+    if (removeBtn) {
+        removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            resetImageUpload();
+        };
+    }
+}
+
+async function handleImageUpload(file) {
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('Image size must be less than 5MB', 'error');
+        return;
+    }
+
+    // Show progress
+    document.getElementById('imageUploadPlaceholder').style.display = 'none';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+    document.getElementById('imageUploadProgress').style.display = 'block';
+
+    // Show local preview first
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('imagePreview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    try {
+        // Upload to server
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch(`${API_URL}/food/upload-image`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Image uploaded successfully!');
+            document.getElementById('itemImage').value = result.imageUrl;
+            uploadedImageUrl = result.imageUrl;
+            showImagePreview(result.imageUrl, file.name);
+        } else {
+            showToast(result.message || 'Failed to upload image', 'error');
+            resetImageUpload();
+        }
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        showToast('Failed to upload image. Using local preview.', 'error');
+        // Keep local preview as fallback
+        showImagePreview(document.getElementById('imagePreview').src, file.name);
+    }
+
+    document.getElementById('imageUploadProgress').style.display = 'none';
+}
+
+function showImagePreview(url, filename) {
+    document.getElementById('imageUploadPlaceholder').style.display = 'none';
+    document.getElementById('imageUploadProgress').style.display = 'none';
+    document.getElementById('imagePreviewContainer').style.display = 'block';
+    document.getElementById('imagePreview').src = url;
+    document.getElementById('imageFileName').textContent = filename || 'Uploaded image';
+}
+
+function resetImageUpload() {
+    uploadedImageUrl = null;
+    document.getElementById('itemImage').value = '';
+    document.getElementById('itemImageFile').value = '';
+
+    const urlInput = document.getElementById('itemImageUrl');
+    const useUrlCheckbox = document.getElementById('useUrlInstead');
+
+    if (urlInput) urlInput.value = '';
+    if (urlInput) urlInput.style.display = 'none';
+    if (useUrlCheckbox) useUrlCheckbox.checked = false;
+
+    document.getElementById('imageUploadPlaceholder').style.display = 'block';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+    document.getElementById('imageUploadProgress').style.display = 'none';
+    document.getElementById('imageUploadContainer').style.display = 'block';
 }
 
 async function saveMenuItem() {
