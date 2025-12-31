@@ -4,17 +4,13 @@ import {
     getMyOrders,
     getOrderById,
     updateOrderStatus,
-    getAllOrders,
-    createGuestOrder
+    getAllOrders
 } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Public route for guest checkout
-router.post('/orders', createGuestOrder);
-
-// Protected user routes
+// All order routes require authentication - no guest checkout
 router.post('/', protect, createOrder);
 router.get('/my-orders', protect, getMyOrders);
 router.get('/:id', protect, getOrderById);

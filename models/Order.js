@@ -4,14 +4,9 @@ const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: false // Make optional for guest orders
+        required: true
     },
-    // Guest customer info (for orders without user account)
-    guestCustomer: {
-        name: String,
-        email: String,
-        phone: String
-    },
+
     orderId: {
         type: String,
         required: true,

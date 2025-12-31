@@ -13,7 +13,7 @@ const generateOrderId = async () => {
 // @access  Private
 export const createOrder = async (req, res) => {
     try {
-        const { deliveryAddress, paymentMethod, items: requestItems, totalAmount: requestTotal, guestCustomer } = req.body;
+        const { deliveryAddress, paymentMethod, items: requestItems, totalAmount: requestTotal } = req.body;
         let orderItems;
         let totalAmount;
 
@@ -60,7 +60,6 @@ export const createOrder = async (req, res) => {
             totalAmount,
             deliveryAddress,
             paymentMethod: paymentMethod || 'cash_on_delivery',
-            guestCustomer: guestCustomer || null,
             estimatedDeliveryTime: new Date(Date.now() + 45 * 60000) // 45 minutes
         });
 
@@ -193,72 +192,4 @@ export const getAllOrders = async (req, res) => {
     }
 };
 
-// @desc    Create guest order (no authentication required)
-// @route   POST /api/orders
-// @access  Public
-export const createGuestOrder = async (req, res) => {
-    try {
-        const { user, items, totalAmount } = req.body;
 
-        // Validate required fields
-        if (!user || !user.name || !user.email || !user.phone || !user.address) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide all customer details: name, email, phone, and address'
-            });
-        }
-
-        if (!items || items.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'Order must contain at least one item'
-            });
-        }
-
-        if (!totalAmount || totalAmount <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid order total amount'
-            });
-        }
-
-        // Generate unique order ID
-        const orderId = await generateOrderId();
-
-        // Create order with guest user info
-        const order = await Order.create({
-            orderId: orderId,
-            guestCustomer: {
-                name: user.name,
-                email: user.email,
-                phone: user.phone
-            },
-            items: items.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price
-            })),
-            totalAmount: totalAmount,
-            deliveryAddress: user.address,
-            paymentMethod: 'cash_on_delivery', // Default for guest orders
-            orderStatus: 'pending',
-            estimatedDeliveryTime: new Date(Date.now() + 45 * 60000) // 45 minutes
-        });
-
-        res.status(201).json({
-            success: true,
-            message: 'Order placed successfully',
-            data: {
-                orderId: order.orderId,
-                totalAmount: order.totalAmount,
-                estimatedDeliveryTime: order.estimatedDeliveryTime
-            }
-        });
-    } catch (error) {
-        console.error('Guest order error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to create order. Please try again.'
-        });
-    }
-};

@@ -102,7 +102,57 @@ const settingsSchema = new mongoose.Schema({
         estimatedDeliveryTime: {
             type: String,
             default: '30-45 minutes'
-        }
+        },
+        // Multiple Restaurant Locations (up to 5)
+        restaurantLocations: [{
+            pincode: {
+                type: String,
+                required: true
+            },
+            name: {
+                type: String,
+                default: 'Location'
+            },
+            area: {
+                type: String,
+                default: ''
+            },
+            city: {
+                type: String,
+                default: ''
+            },
+            state: {
+                type: String,
+                default: ''
+            },
+            isActive: {
+                type: Boolean,
+                default: true
+            }
+        }],
+        // Legacy field - for backward compatibility
+        restaurantPincode: {
+            type: String,
+            default: '500001'
+        },
+        deliveryRadius: {
+            type: Number,
+            default: 10  // in KM
+        },
+        servicablePincodes: [{
+            pincode: {
+                type: String,
+                required: true
+            },
+            area: {
+                type: String,
+                default: ''
+            },
+            isActive: {
+                type: Boolean,
+                default: true
+            }
+        }]
     },
 
     // Notification Settings

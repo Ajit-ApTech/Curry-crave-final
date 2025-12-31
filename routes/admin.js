@@ -2,6 +2,7 @@ import express from 'express';
 import {
     getDashboardStats,
     getAllUsers,
+    getUserById,
     getTopItems,
     getAllOrdersForAdmin,
     getAnalytics
@@ -18,6 +19,7 @@ router.get('/stats', getDashboardStats);
 
 // Users management
 router.get('/users', getAllUsers);
+router.get('/users/:id', getUserById);
 
 // Analytics
 router.get('/top-items', getTopItems);

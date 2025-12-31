@@ -142,7 +142,7 @@ export const getDashboardStats = async (req, res) => {
     }
 };
 
-// @desc    Get all users with pagination
+// @desc    Get all registered users with pagination
 // @route   GET /api/admin/users
 // @access  Private/Admin
 export const getAllUsers = async (req, res) => {
@@ -171,7 +171,8 @@ export const getAllUsers = async (req, res) => {
                 return {
                     ...user.toObject(),
                     orderCount,
-                    totalSpent: totalSpent.length > 0 ? totalSpent[0].total : 0
+                    totalSpent: totalSpent.length > 0 ? totalSpent[0].total : 0,
+                    userType: 'registered'
                 };
             })
         );
@@ -195,7 +196,44 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
-// @desc    Get top selling items
+// @desc    Get single user by ID
+// @route   GET /api/admin/users/:id
+// @access  Private/Admin
+export const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Get order stats for user
+        const orderCount = await Order.countDocuments({ user: user._id });
+        const totalSpentData = await Order.aggregate([
+            { $match: { user: user._id, orderStatus: { $ne: 'cancelled' } } },
+            { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+        ]);
+
+        res.json({
+            success: true,
+            user: {
+                ...user.toObject(),
+                orderCount,
+                totalSpent: totalSpentData.length > 0 ? totalSpentData[0].total : 0
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user',
+            error: error.message
+        });
+    }
+};
+
 // @route   GET /api/admin/top-items
 // @access  Private/Admin
 export const getTopItems = async (req, res) => {
