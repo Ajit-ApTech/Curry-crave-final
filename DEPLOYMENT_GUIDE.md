@@ -55,7 +55,7 @@ git push -u origin main
 | **Name** | `curry-crave-backend` |
 | **Region** | Choose closest to your users |
 | **Branch** | `main` |
-| **Root Directory** | (leave empty) |
+| **Root Directory** | `Backend/curry-crave-backend` |
 | **Runtime** | `Node` |
 | **Build Command** | `npm install` |
 | **Start Command** | `npm start` |
