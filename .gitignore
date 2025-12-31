@@ -1,5 +1,41 @@
+# Node.js
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# macOS
 .DS_Store
-uploads/
-*.log
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build/Dist
+dist/
+build/
+out/
+Backend/curry-crave-backend/node_modules/
+Backend/curry-crave-backend/.env
+Backend/curry-crave-backend/.env.backup
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.zip

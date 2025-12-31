@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Curry Crave - Premium Food Delivery</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="logo-text">
+                    <a href="#home" class="brand-name" id="navBrandName">Curry Crave</a>
+                    <div class="logo-underline"></div>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-links desktop-nav">
+                <a href="#home" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#menu" class="nav-link">
+                    <i class="fas fa-utensils"></i>
+                    <span>Menu</span>
+                </a>
+                <a href="#services" class="nav-link">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Services</span>
+                </a>
+                <a href="#about" class="nav-link">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </a>
+                <a href="#contact" class="nav-link">
+                    <i class="fas fa-phone"></i>
+                    <span>Contact</span>
+                </a>
+            </div>
+
+            <!-- Cart and Auth Buttons -->
+            <div class="nav-actions">
+                <a href="#cart" class="cart-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <button class="auth-btn" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span>Login</span>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav" id="mobileNav">
+            <a href="#home" class="mobile-nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#menu" class="mobile-nav-link">
+                <i class="fas fa-utensils"></i>
+                <span>Menu</span>
+            </a>
+            <a href="#services" class="mobile-nav-link">
+                <i class="fas fa-concierge-bell"></i>
+                <span>Services</span>
+            </a>
+            <a href="#about" class="mobile-nav-link">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
+            </a>
+            <a href="#contact" class="mobile-nav-link">
+                <i class="fas fa-phone"></i>
+                <span>Contact</span>
+            </a>
+            <a href="#cart" class="mobile-nav-link cart-mobile">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Banner Section -->
+    <section class="hero-banner" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Welcome to
+                    <br>
+                    <span class="hero-highlight" id="heroBrandName">Curry Crave</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Experience authentic flavors delivered fresh to your doorstep. Premium quality,
+                    exquisite taste, and unforgettable dining experience.
+                </p>
+
+                <!-- Search Bar -->
+                <form class="hero-search" id="heroSearchForm">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="Discover your next favorite meal..."
+                            class="search-input">
+                        <button type="submit" class="search-btn">Search</button>
+                    </div>
+                </form>
+
+                <!-- Action Buttons -->
+                <div class="hero-actions">
+                    <button class="action-btn download-btn">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Download App</span>
+                    </button>
+                    <button class="action-btn watch-btn" id="watchVideoBtn">
+                        <i class="fas fa-play"></i>
+                        <span>Watch Video</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <div class="image-container">
+                    <img src="assets/images/hero-dish.jpg" alt="Delicious Curry" class="main-image">
+                    <div class="image-overlay"></div>
+                </div>
+                <!-- Orbiting Images -->
+                <div class="orbit-container">
+                    <div class="orbit-item orbit-1">
+                        <img src="assets/images/dish-1.jpg" alt="Dish 1">
+                    </div>
+                    <div class="orbit-item orbit-2">
+                        <img src="assets/images/dish-2.jpg" alt="Dish 2">
+                    </div>
+                    <div class="orbit-item orbit-3">
+                        <img src="assets/images/dish-3.jpg" alt="Dish 3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Menu Section -->
+    <section class="special-menu" id="specialMenu">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Today's Special</h2>
+                <p class="section-subtitle">Handpicked delicacies crafted by our master chefs</p>
+            </div>
+
+            <div class="special-items" id="specialItems">
+                <!-- Special items will be dynamically loaded -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image">
+                    <img id="aboutImage" src="assets/images/about-chef.jpg" alt="Our Chef">
+                    <div class="experience-badge">
+                        <span class="badge-number" id="aboutExperienceYears">10+</span>
+                        <span class="badge-text" id="aboutExperienceText">Years Experience</span>
+                    </div>
+                </div>
+                <div class="about-text">
+                    <h2 class="about-title">About <span class="highlight" id="aboutBrandName">Curry Crave</span></h2>
+                    <p class="about-description" id="aboutParagraph1">
+                        At Curry Crave, we believe food is more than sustenance—it's an experience.
+                        Our master chefs blend traditional recipes with modern techniques to create
+                        unforgettable culinary masterpieces.
+                    </p>
+                    <p class="about-description" id="aboutParagraph2">
+                        With over a decade of excellence, we've served thousands of satisfied customers,
+                        earning their trust through quality, authenticity, and exceptional service.
+                    </p>
+                    <div class="about-features" id="aboutFeatures">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="aboutFeature1">Fresh Ingredients</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="aboutFeature2">Expert Chefs</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="aboutFeature3">Fast Delivery</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="aboutFeature4">Premium Quality</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="menu-section" id="menu">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Menu</h2>
+                <p class="section-subtitle">Explore our extensive collection of authentic dishes</p>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="category-filters">
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="curry">Curry</button>
+                <button class="category-btn" data-category="bread">Bread</button>
+                <button class="category-btn" data-category="rice">Rice</button>
+                <button class="category-btn" data-category="drinks">Drinks</button>
+                <button class="category-btn" data-category="desserts">Desserts</button>
+            </div>
+
+            <!-- Menu Items Grid -->
+            <div class="menu-grid" id="menuGrid">
+                <!-- Menu items will be dynamically loaded -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Services</h2>
+                <p class="section-subtitle">We're here to serve you better</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3 class="service-title">Fast Delivery</h3>
+                    <p class="service-description">
+                        Lightning-fast delivery ensuring your food arrives hot and fresh at your doorstep.
+                    </p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3 class="service-title">Curry Delights</h3>
+                    <p class="service-description">
+                        Authentic curry recipes with rich flavors and aromatic spices from master chefs.
+                    </p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-bread-slice"></i>
+                    </div>
+                    <h3 class="service-title">Fresh Breads</h3>
+                    <p class="service-description">
+                        Freshly baked naan, roti, and paratha made to perfection every single time.
+                    </p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-drumstick-bite"></i>
+                    </div>
+                    <h3 class="service-title">Veg & Non-Veg</h3>
+                    <p class="service-description">
+                        Wide variety of vegetarian and non-vegetarian options to satisfy every palate.
+                    </p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-bowl-rice"></i>
+                    </div>
+                    <h3 class="service-title">Meals & Combos</h3>
+                    <p class="service-description">
+                        Complete meal packages with perfect combinations at unbeatable prices.
+                    </p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="service-title">24/7 Support</h3>
+                    <p class="service-description">
+                        Round-the-clock customer support via live chat and WhatsApp assistance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Contact Us</h2>
+                <p class="section-subtitle">We'd love to hear from you</p>
+            </div>
+
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Address</h4>
+                            <p id="contactAddress">123 Food Street, Culinary District<br>Hyderabad, Telangana 500001</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Phone</h4>
+                            <p id="contactPhone">+91 98765 43210<br>+91 87654 32109</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p id="contactEmail">info@currycrave.com<br>support@currycrave.com</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h4>Hours</h4>
+                            <p id="contactHours">Mon - Sat: 10:00 AM - 11:00 PM<br>Sunday: 11:00 AM - 10:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrapper">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send Message</span>
+                        </button>
+                    </form>
+                    <button class="whatsapp-btn" id="whatsappBtn">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Chat on WhatsApp</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title" id="footerTitle">Curry Crave</h3>
+                    <p class="footer-text" id="footerTagline">
+                        Premium food delivery service bringing authentic flavors to your doorstep.
+                    </p>
+                    <div class="social-links" id="socialLinks">
+                        <a href="#" class="social-link" id="socialFacebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link" id="socialInstagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link" id="socialTwitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link" id="socialYoutube"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-subtitle">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#menu">Menu</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="admin.html" style="color: #D4AF37;"><i class="fas fa-lock"></i> Admin Login</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-subtitle">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Curry Specials</a></li>
+                        <li><a href="#">Fresh Breads</a></li>
+                        <li><a href="#">Meal Combos</a></li>
+                        <li><a href="#">Catering</a></li>
+                        <li><a href="#">Bulk Orders</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-subtitle">Newsletter</h4>
+                    <p class="footer-text">Subscribe for exclusive offers and updates</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email" required>
+                        <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p id="footerCopyright">&copy; 2025 Curry Crave. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Video Modal -->
+    <div class="video-modal" id="videoModal">
+        <button class="close-modal" id="closeVideo">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="video-container">
+            <iframe id="videoFrame" width="100%" height="100%" src="" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="close-modal" id="closeLogin">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="modal-title">Curry Crave</h2>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="rememberMe">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </button>
+                <p class="form-footer">
+                    Don't have an account? <a href="#" class="signup-link">Sign Up</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-cart" id="closeCart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be dynamically loaded -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-amount" id="totalAmount">₹0</span>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Checkout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
+<script src="js/orderTracking.js"></script>
