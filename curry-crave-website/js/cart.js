@@ -7,6 +7,12 @@
 let cart = [];
 const CART_STORAGE_KEY = 'curryCraveCart';
 
+// API URL helper - use production URL as fallback
+const PRODUCTION_API_URL = 'https://curry-crave-backend.onrender.com/api';
+function getApiUrl() {
+    return window.API?.config?.BASE_URL || PRODUCTION_API_URL;
+}
+
 // Initialize cart on page load
 document.addEventListener('DOMContentLoaded', function () {
     loadCartFromStorage();
@@ -383,8 +389,7 @@ async function validateDeliveryPincode(pincode) {
             pincodeLoader.style.display = 'block';
             pincodeStatus.style.display = 'none';
 
-            const API_URL = window.API?.config?.BASE_URL || 'http://localhost:5001/api';
-            const response = await fetch(`${API_URL}/delivery/validate-pincode`, {
+            const response = await fetch(`${getApiUrl()}/delivery/validate-pincode`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -666,7 +671,7 @@ async function processCODOrder(orderData) {
     let orderSavedToBackend = false;
 
     try {
-        const response = await fetch(`${window.API.config.BASE_URL}/order`, {
+        const response = await fetch(`${getApiUrl()}/order`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -717,7 +722,7 @@ async function processRazorpayPayment(orderData) {
 
     try {
         // First create the order in backend
-        const orderResponse = await fetch(`${window.API.config.BASE_URL}/order`, {
+        const orderResponse = await fetch(`${getApiUrl()}/order`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -739,7 +744,7 @@ async function processRazorpayPayment(orderData) {
         const orderId = orderResult.order?.orderId || orderResult.data?.orderId;
 
         // Create Razorpay order
-        const razorpayResponse = await fetch(`${window.API.config.BASE_URL}/payment/create-order`, {
+        const razorpayResponse = await fetch(`${getApiUrl()}/payment/create-order`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -778,7 +783,7 @@ async function processRazorpayPayment(orderData) {
             handler: async function (response) {
                 // Payment successful - verify on backend
                 try {
-                    const verifyResponse = await fetch(`${window.API.config.BASE_URL}/payment/verify`, {
+                    const verifyResponse = await fetch(`${getApiUrl()}/payment/verify`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -937,7 +942,7 @@ async function processPaymentAndOrder(orderData) {
         let response;
 
         // Create authenticated order (mandatory since login is required)
-        response = await fetch(`${window.API.config.BASE_URL}/order`, {
+        response = await fetch(`${getApiUrl()}/order`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
