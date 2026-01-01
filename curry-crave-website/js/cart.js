@@ -183,7 +183,7 @@ function showCheckoutModal() {
     modal.className = 'login-modal active';
     modal.innerHTML = `
         <div class="modal-overlay"></div>
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
             <button class="close-modal" onclick="closeCheckoutModal()">
                 <i class="fas fa-times"></i>
             </button>
@@ -192,6 +192,7 @@ function showCheckoutModal() {
                 ${itemCount} item(s) • Total: ₹${total}
             </p>
             <form class="login-form" id="checkoutForm" onsubmit="submitOrder(event)">
+                <!-- Customer Details Section -->
                 <div class="form-group">
                     <label>
                         <i class="fas fa-user"></i>
@@ -235,7 +236,73 @@ function showCheckoutModal() {
                     </label>
                     <textarea id="customerAddress" required placeholder="Enter your complete address (house no, street, landmark)" rows="3" style="width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: var(--cream-white); font-family: 'Poppins', sans-serif; resize: vertical;"></textarea>
                 </div>
-                <button type="submit" class="submit-btn" id="placeOrderBtn" disabled>
+
+                <!-- Payment Method Section -->
+                <div style="margin: 25px 0 20px 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
+                        <i class="fas fa-credit-card" style="color: var(--primary-gold); font-size: 18px;"></i>
+                        <span style="color: var(--primary-gold); font-weight: 600; font-size: 16px;">Payment Method</span>
+                    </div>
+                    
+                    <!-- Cash on Delivery Option -->
+                    <div class="payment-option" id="paymentCOD" onclick="selectPaymentMethod('cod')" style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(76, 175, 80, 0.05) 100%); border: 2px solid #4CAF50; border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease; position: relative;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #4CAF50; display: flex; align-items: center; justify-content: center; background: #4CAF50;">
+                                <i class="fas fa-check" style="color: white; font-size: 12px;"></i>
+                            </div>
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #4CAF50, #45a049); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-money-bill-wave" style="color: white; font-size: 16px;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="color: #4CAF50; font-weight: 600; font-size: 15px;">Cash on Delivery</div>
+                                <div style="color: var(--light-gold); font-size: 12px; opacity: 0.8;">Pay when delivered</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px; text-transform: uppercase;">Recommended</div>
+                        </div>
+                        <input type="radio" name="paymentMethod" value="cod" checked style="display: none;">
+                    </div>
+
+                    <!-- UPI QR Code Option -->
+                    <div class="payment-option" id="paymentUPI" onclick="selectPaymentMethod('upi')" style="background: rgba(40, 40, 40, 0.6); border: 2px solid rgba(80, 80, 80, 0.5); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(100, 100, 100, 0.6); display: flex; align-items: center; justify-content: center;" id="upiRadio">
+                            </div>
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #6739B7, #4A148C); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-qrcode" style="color: white; font-size: 16px;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="color: #B388FF; font-weight: 600; font-size: 15px;">UPI QR Code</div>
+                                <div style="color: var(--light-gold); font-size: 12px; opacity: 0.8;">Scan & pay with any UPI app</div>
+                            </div>
+                        </div>
+                        <input type="radio" name="paymentMethod" value="upi" style="display: none;">
+                    </div>
+
+                    <!-- Razorpay Option -->
+                    <div class="payment-option" id="paymentRazorpay" onclick="selectPaymentMethod('razorpay')" style="background: rgba(40, 40, 40, 0.6); border: 2px solid rgba(80, 80, 80, 0.5); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(100, 100, 100, 0.6); display: flex; align-items: center; justify-content: center;" id="razorpayRadio">
+                            </div>
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #528FF0, #1565C0); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-wallet" style="color: white; font-size: 16px;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="color: #64B5F6; font-weight: 600; font-size: 15px;">Razorpay</div>
+                                <div style="color: var(--light-gold); font-size: 12px; opacity: 0.8;">Card, UPI, NetBanking, Wallets</div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <i class="fab fa-cc-visa" style="color: #1A1F71; font-size: 18px;"></i>
+                                <i class="fab fa-cc-mastercard" style="color: #EB001B; font-size: 18px;"></i>
+                            </div>
+                        </div>
+                        <input type="radio" name="paymentMethod" value="razorpay" style="display: none;">
+                    </div>
+                </div>
+
+                <input type="hidden" id="selectedPaymentMethod" value="cod">
+
+                <!-- Continue Button -->
+                <button type="submit" class="submit-btn" id="placeOrderBtn" disabled style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 50%, #E65100 100%); border: none; width: 100%; padding: 16px; border-radius: 30px; font-size: 16px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(255, 152, 0, 0.4);">
                     <i class="fas fa-check-circle"></i>
                     <span>Verify Pincode First</span>
                 </button>
@@ -251,6 +318,7 @@ function showCheckoutModal() {
     // Pre-fill if user data exists
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const userPincode = localStorage.getItem('userPincode');
+    const savedAddress = localStorage.getItem('savedAddress');
 
     if (user.name) {
         const nameInput = document.getElementById('customerName');
@@ -271,9 +339,13 @@ function showCheckoutModal() {
         document.getElementById('customerPincode').value = userPincode;
         validateDeliveryPincode(userPincode);
     }
+    if (savedAddress) document.getElementById('customerAddress').value = savedAddress;
 
     // Show delivery note
     document.getElementById('deliveryNote').style.display = 'block';
+
+    // Add hover effects for payment options
+    addPaymentOptionHoverEffects();
 }
 
 // ===== VALIDATE DELIVERY PINCODE =====
@@ -399,6 +471,98 @@ function closeCheckoutModal() {
     }
 }
 
+// ===== PAYMENT METHOD SELECTION =====
+let selectedPaymentMethod = 'cod';
+
+function selectPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    document.getElementById('selectedPaymentMethod').value = method;
+
+    // Update all payment options UI
+    const paymentOptions = {
+        cod: { element: 'paymentCOD', color: '#4CAF50', borderColor: '#4CAF50' },
+        upi: { element: 'paymentUPI', color: '#B388FF', borderColor: '#6739B7' },
+        razorpay: { element: 'paymentRazorpay', color: '#64B5F6', borderColor: '#528FF0' }
+    };
+
+    // Reset all options
+    Object.keys(paymentOptions).forEach(key => {
+        const option = document.getElementById(paymentOptions[key].element);
+        if (option) {
+            if (key === method) {
+                // Selected state
+                option.style.background = `linear-gradient(135deg, rgba(${hexToRgb(paymentOptions[key].color)}, 0.15) 0%, rgba(${hexToRgb(paymentOptions[key].color)}, 0.05) 100%)`;
+                option.style.borderColor = paymentOptions[key].borderColor;
+
+                // Update radio indicator
+                const radioDiv = option.querySelector('div[style*="border-radius: 50%"]');
+                if (radioDiv) {
+                    radioDiv.style.background = paymentOptions[key].color;
+                    radioDiv.style.borderColor = paymentOptions[key].color;
+                    radioDiv.innerHTML = '<i class="fas fa-check" style="color: white; font-size: 12px;"></i>';
+                }
+            } else {
+                // Unselected state
+                option.style.background = 'rgba(40, 40, 40, 0.6)';
+                option.style.borderColor = 'rgba(80, 80, 80, 0.5)';
+
+                // Update radio indicator
+                const radioDiv = option.querySelector('div[style*="border-radius: 50%"]');
+                if (radioDiv) {
+                    radioDiv.style.background = 'transparent';
+                    radioDiv.style.borderColor = 'rgba(100, 100, 100, 0.6)';
+                    radioDiv.innerHTML = '';
+                }
+            }
+        }
+    });
+
+    // Update button text based on payment method
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    if (placeOrderBtn) {
+        if (method === 'cod') {
+            placeOrderBtn.innerHTML = `<i class="fas fa-check-circle"></i><span>Place Order - ₹${total}</span>`;
+        } else if (method === 'upi') {
+            placeOrderBtn.innerHTML = `<i class="fas fa-qrcode"></i><span>Continue to Pay - ₹${total}</span>`;
+        } else if (method === 'razorpay') {
+            placeOrderBtn.innerHTML = `<i class="fas fa-lock"></i><span>Pay Securely - ₹${total}</span>`;
+        }
+    }
+}
+
+// Helper function to convert hex to RGB
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (result) {
+        return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
+    }
+    return '76, 175, 80'; // Default green
+}
+
+// Add hover effects for payment options
+function addPaymentOptionHoverEffects() {
+    const options = document.querySelectorAll('.payment-option');
+    options.forEach(option => {
+        option.addEventListener('mouseenter', function () {
+            if (!this.style.borderColor.includes('4CAF50') &&
+                !this.style.borderColor.includes('6739B7') &&
+                !this.style.borderColor.includes('528FF0')) {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.3)';
+            }
+        });
+        option.addEventListener('mouseleave', function () {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+}
+
+// Make functions global
+window.selectPaymentMethod = selectPaymentMethod;
+window.addPaymentOptionHoverEffects = addPaymentOptionHoverEffects;
+
 // ===== SUBMIT ORDER =====
 async function submitOrder(event) {
     event.preventDefault();
@@ -406,16 +570,33 @@ async function submitOrder(event) {
     // Check if pincode was validated
     if (!isPincodeDeliverable) {
         if (typeof window.showToast === 'function') {
-            window.showToast('Please enter a valid pincode for delivery');
+            window.showToast('Please enter a valid pincode for delivery', 'error');
         }
         return;
     }
 
+    // Get customer details from form fields
     const customerName = document.getElementById('customerName').value;
     const customerEmail = document.getElementById('customerEmail').value;
     const customerPhone = document.getElementById('customerPhone').value;
     const customerPincode = document.getElementById('customerPincode').value;
     const customerAddress = document.getElementById('customerAddress').value;
+
+    // Validate all required fields
+    if (!customerName || !customerEmail || !customerPhone || !customerPincode || !customerAddress) {
+        if (typeof window.showToast === 'function') {
+            window.showToast('Please fill in all required fields', 'error');
+        }
+        return;
+    }
+
+    // Validate address length
+    if (customerAddress.trim().length < 10) {
+        if (typeof window.showToast === 'function') {
+            window.showToast('Please enter a complete delivery address', 'error');
+        }
+        return;
+    }
 
     // Calculate total
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -430,21 +611,257 @@ async function submitOrder(event) {
             address: customerAddress
         },
         items: cart.map(item => ({
-            menuItemId: item.id,
+            menuItemId: item.id || item._id,
             name: item.name,
             quantity: item.quantity,
             price: item.price
         })),
         totalAmount: total,
+        paymentMethod: selectedPaymentMethod,
         orderStatus: 'pending'
     };
 
-    // Save pincode for future orders
+    // Save customer data for future orders
     localStorage.setItem('userPincode', customerPincode);
+    localStorage.setItem('savedAddress', customerAddress);
 
-    // Close checkout modal and show QR payment modal
+    // Get selected payment method BEFORE closing modal (read from hidden input as primary source)
+    const paymentMethodInput = document.getElementById('selectedPaymentMethod');
+    const paymentMethod = paymentMethodInput ? paymentMethodInput.value : selectedPaymentMethod;
+
+    console.log('Payment method from variable:', selectedPaymentMethod);
+    console.log('Payment method from input:', paymentMethodInput?.value);
+    console.log('Final payment method:', paymentMethod);
+
+    // Update orderData with the correct payment method
+    orderData.paymentMethod = paymentMethod;
+
+    // Close checkout modal
     closeCheckoutModal();
-    showQRPaymentModal(orderData);
+
+    // Process based on payment method
+    if (paymentMethod === 'cod') {
+        // Cash on Delivery - Process order directly
+        console.log('Processing COD order...');
+        processCODOrder(orderData);
+    } else if (paymentMethod === 'upi') {
+        // UPI QR Code - Show QR modal
+        console.log('Processing UPI order...');
+        showQRPaymentModal(orderData);
+    } else if (paymentMethod === 'razorpay') {
+        // Razorpay - Initialize payment
+        console.log('Processing Razorpay order...');
+        processRazorpayPayment(orderData);
+    } else {
+        // Default to COD if unknown
+        console.log('Unknown payment method, defaulting to COD...');
+        processCODOrder(orderData);
+    }
+}
+
+// ===== PROCESS COD ORDER =====
+async function processCODOrder(orderData) {
+    const authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+    let orderId;
+    let orderSavedToBackend = false;
+
+    try {
+        const response = await fetch(`${window.API.config.BASE_URL}/order`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                deliveryAddress: orderData.user.address,
+                paymentMethod: 'cash_on_delivery',
+                items: orderData.items,
+                totalAmount: orderData.totalAmount
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            orderId = result.order?.orderId || result.data?.orderId || ('ORD' + Date.now());
+            orderSavedToBackend = true;
+
+            if (typeof window.showToast === 'function') {
+                window.showToast(`✅ Order ${orderId} placed successfully!`);
+            }
+        } else {
+            throw new Error('Failed to create order');
+        }
+    } catch (error) {
+        console.error('Error creating COD order:', error);
+        orderId = 'ORD' + Date.now();
+        orderSavedToBackend = false;
+
+        if (typeof window.showToast === 'function') {
+            window.showToast('⚠️ Order created offline - ' + orderId);
+        }
+    }
+
+    // Clear cart and show confirmation
+    cart = [];
+    saveCartToStorage();
+    updateCartUI();
+    updateCartDisplay();
+    document.getElementById('cartSidebar')?.classList.remove('active');
+
+    showOrderConfirmationWithTracking(orderId, orderData, orderSavedToBackend, true);
+}
+
+// ===== PROCESS RAZORPAY PAYMENT =====
+async function processRazorpayPayment(orderData) {
+    const authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+
+    try {
+        // First create the order in backend
+        const orderResponse = await fetch(`${window.API.config.BASE_URL}/order`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                deliveryAddress: orderData.user.address,
+                paymentMethod: 'razorpay',
+                items: orderData.items,
+                totalAmount: orderData.totalAmount
+            })
+        });
+
+        if (!orderResponse.ok) {
+            throw new Error('Failed to create order');
+        }
+
+        const orderResult = await orderResponse.json();
+        const orderId = orderResult.order?.orderId || orderResult.data?.orderId;
+
+        // Create Razorpay order
+        const razorpayResponse = await fetch(`${window.API.config.BASE_URL}/payment/create-order`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                amount: orderData.totalAmount,
+                orderId: orderId
+            })
+        });
+
+        if (!razorpayResponse.ok) {
+            const errorData = await razorpayResponse.json().catch(() => ({}));
+            if (errorData.notConfigured) {
+                throw new Error('Razorpay is not configured. Please contact support or use Cash on Delivery.');
+            }
+            throw new Error('Failed to create Razorpay order');
+        }
+
+        const razorpayData = await razorpayResponse.json();
+
+        // Check if Razorpay SDK is loaded
+        if (typeof Razorpay === 'undefined') {
+            // Load Razorpay SDK dynamically
+            await loadRazorpayScript();
+        }
+
+        // Configure Razorpay options
+        const options = {
+            key: razorpayData.data.key,
+            amount: razorpayData.data.amount,
+            currency: razorpayData.data.currency || 'INR',
+            name: 'Curry Crave',
+            description: `Order #${orderId}`,
+            order_id: razorpayData.data.orderId,
+            handler: async function (response) {
+                // Payment successful - verify on backend
+                try {
+                    const verifyResponse = await fetch(`${window.API.config.BASE_URL}/payment/verify`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            orderId: orderId
+                        })
+                    });
+
+                    if (verifyResponse.ok) {
+                        // Payment verified successfully
+                        cart = [];
+                        saveCartToStorage();
+                        updateCartUI();
+                        updateCartDisplay();
+                        document.getElementById('cartSidebar')?.classList.remove('active');
+
+                        if (typeof window.showToast === 'function') {
+                            window.showToast('🎉 Payment successful! Order confirmed.');
+                        }
+
+                        showOrderConfirmationWithTracking(orderId, orderData, true, true);
+                    } else {
+                        throw new Error('Payment verification failed');
+                    }
+                } catch (error) {
+                    console.error('Payment verification error:', error);
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Payment verification failed. Please contact support.', 'error');
+                    }
+                }
+            },
+            prefill: {
+                name: orderData.user.name,
+                email: orderData.user.email,
+                contact: orderData.user.phone
+            },
+            notes: {
+                address: orderData.user.address
+            },
+            theme: {
+                color: '#D4AF37'
+            },
+            modal: {
+                ondismiss: function () {
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Payment cancelled');
+                    }
+                }
+            }
+        };
+
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+
+    } catch (error) {
+        console.error('Razorpay payment error:', error);
+        if (typeof window.showToast === 'function') {
+            // Show specific error message if available
+            const errorMsg = error.message || 'Payment initialization failed. Please try again.';
+            window.showToast(errorMsg, 'error');
+        }
+    }
+}
+
+// ===== LOAD RAZORPAY SCRIPT =====
+function loadRazorpayScript() {
+    return new Promise((resolve, reject) => {
+        if (typeof Razorpay !== 'undefined') {
+            resolve();
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
 }
 
 // ===== SHOW QR PAYMENT MODAL =====
@@ -793,3 +1210,6 @@ window.submitOrder = submitOrder;
 window.cancelPayment = cancelPayment;
 window.closeOrderConfirmation = closeOrderConfirmation;
 window.redirectToOrderTracking = redirectToOrderTracking;
+window.processCODOrder = processCODOrder;
+window.processRazorpayPayment = processRazorpayPayment;
+window.loadRazorpayScript = loadRazorpayScript;

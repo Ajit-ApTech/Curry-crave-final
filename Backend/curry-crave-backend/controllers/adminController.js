@@ -168,10 +168,18 @@ export const getAllUsers = async (req, res) => {
                     { $group: { _id: null, total: { $sum: '$totalAmount' } } }
                 ]);
 
+                // Get last delivery address from most recent order
+                const lastOrder = await Order.findOne({ user: user._id })
+                    .sort({ createdAt: -1 })
+                    .select('deliveryAddress');
+
+                const lastAddress = lastOrder?.deliveryAddress || null;
+
                 return {
                     ...user.toObject(),
                     orderCount,
                     totalSpent: totalSpent.length > 0 ? totalSpent[0].total : 0,
+                    lastDeliveryAddress: lastAddress,
                     userType: 'registered'
                 };
             })

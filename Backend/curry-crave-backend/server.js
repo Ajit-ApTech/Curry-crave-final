@@ -1,5 +1,8 @@
-import express from 'express';
 import dotenv from 'dotenv';
+// Load environment variables FIRST before any other imports
+dotenv.config();
+
+import express from 'express';
 import cors from 'cors';
 import connectDB from './config/database.js';
 import User from './models/User.js';
@@ -13,9 +16,6 @@ import paymentRoutes from './routes/payment.js';
 import adminRoutes from './routes/admin.js';
 import settingsRoutes from './routes/settings.js';
 import deliveryRoutes from './routes/delivery.js';
-
-// Load environment variables
-dotenv.config();
 
 // Connect to MongoDB and create admin user
 const initializeServer = async () => {

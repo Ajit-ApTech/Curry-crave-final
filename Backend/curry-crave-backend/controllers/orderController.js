@@ -103,7 +103,9 @@ export const getMyOrders = async (req, res) => {
 // @access  Private
 export const getOrderById = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id).populate('items.food');
+        const order = await Order.findById(req.params.id)
+            .populate('user', 'name email phone')
+            .populate('items.food');
 
         if (!order) {
             return res.status(404).json({

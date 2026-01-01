@@ -347,10 +347,10 @@ const PaymentAPI = {
     /**
      * Create Razorpay order
      */
-    async createOrder(amount) {
+    async createOrder(amount, orderId) {
         return apiRequest('/payment/create-order', {
             method: 'POST',
-            body: JSON.stringify({ amount }),
+            body: JSON.stringify({ amount, orderId }),
             auth: true
         });
     },
@@ -364,8 +364,28 @@ const PaymentAPI = {
             body: JSON.stringify(paymentData),
             auth: true
         });
+    },
+
+    /**
+     * Handle failed payment
+     */
+    async handleFailedPayment(orderId, error) {
+        return apiRequest('/payment/failed', {
+            method: 'POST',
+            body: JSON.stringify({ orderId, error }),
+            auth: true
+        });
+    },
+
+    /**
+     * Get Razorpay Key (public)
+     */
+    getRazorpayKey() {
+        // Return the test key - in production this should come from backend
+        return 'rzp_test_RyefYqJac9UKYw';
     }
 };
+
 
 // ===== ADMIN API =====
 

@@ -120,7 +120,7 @@ function startOrderRefresh() {
     // Clear any existing interval
     stopOrderRefresh();
 
-    // Refresh orders every 10 seconds
+    // Refresh orders every 25 seconds
     orderRefreshInterval = setInterval(() => {
         const modal = document.getElementById('orderTrackingModal');
         // Only refresh if modal is still open
@@ -130,7 +130,7 @@ function startOrderRefresh() {
         } else {
             stopOrderRefresh();
         }
-    }, 10000); // 10 seconds
+    }, 25000); // 25 seconds
 }
 
 function stopOrderRefresh() {

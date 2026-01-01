@@ -2,13 +2,18 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from '../models/Order.js';
 
-// Initialize Razorpay (optional - only if keys are provided)
+// Lazy initialization of Razorpay (initialize on first use, not at module load)
 let razorpay = null;
-if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-    razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET
-    });
+
+function getRazorpay() {
+    if (!razorpay && process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+        razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        });
+        console.log('✅ Razorpay initialized successfully');
+    }
+    return razorpay;
 }
 
 
@@ -18,6 +23,18 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
 export const createRazorpayOrder = async (req, res) => {
     try {
         const { amount, orderId } = req.body;
+
+        // Get Razorpay instance (lazy initialization)
+        const razorpayInstance = getRazorpay();
+
+        // Check if Razorpay is configured
+        if (!razorpayInstance) {
+            return res.status(503).json({
+                success: false,
+                message: 'Razorpay is not configured. Please add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to your .env file.',
+                notConfigured: true
+            });
+        }
 
         // Validate input
         if (!amount || !orderId) {
@@ -38,7 +55,7 @@ export const createRazorpayOrder = async (req, res) => {
             }
         };
 
-        const razorpayOrder = await razorpay.orders.create(options);
+        const razorpayOrder = await razorpayInstance.orders.create(options);
 
         // Update order with Razorpay order ID
         await Order.findOneAndUpdate(
@@ -154,7 +171,8 @@ export const paymentFailed = async (req, res) => {
 // @access  Private
 export const getPaymentDetails = async (req, res) => {
     try {
-        const payment = await razorpay.payments.fetch(req.params.paymentId);
+        const razorpayInstance = getRazorpay();
+        const payment = await razorpayInstance.payments.fetch(req.params.paymentId);
 
         res.status(200).json({
             success: true,
@@ -174,8 +192,9 @@ export const getPaymentDetails = async (req, res) => {
 export const refundPayment = async (req, res) => {
     try {
         const { paymentId, amount } = req.body;
+        const razorpayInstance = getRazorpay();
 
-        const refund = await razorpay.payments.refund(paymentId, {
+        const refund = await razorpayInstance.payments.refund(paymentId, {
             amount: amount * 100, // Amount in paise
             speed: 'normal'
         });

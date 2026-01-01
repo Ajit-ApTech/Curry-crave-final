@@ -1636,7 +1636,7 @@ function displayUserDetailsModal(user) {
                     </div>
                     <div style="display: flex; justify-content: space-between;">
                         <span style="color: var(--light-gold);"><i class="fas fa-map-marker-alt"></i> Address</span>
-                        <span style="color: var(--cream);">${user.address || 'Not provided'}</span>
+                        <span style="color: var(--cream);">${user.lastDeliveryAddress || user.address || 'Not provided'}</span>
                     </div>
                 </div>
                 
