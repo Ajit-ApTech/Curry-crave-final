@@ -915,13 +915,13 @@ function showPaymentFailedModal(errorMessage) {
                 </p>
             </div>
             <div style="display: flex; gap: 12px; margin-top: 25px;">
-                <button onclick="closePaymentFailedModal()" class="submit-btn" style="flex: 1; background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(150, 150, 150, 0.5);">
-                    <i class="fas fa-times"></i>
-                    <span>Close</span>
+                <button onclick="closePaymentFailedModal()" style="flex: 1; background: #3a3a3a; border: 2px solid #666; border-radius: 25px; padding: 14px 20px; color: #ffffff; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;">
+                    <i class="fas fa-times" style="color: #ffffff;"></i>
+                    <span style="color: #ffffff;">Close</span>
                 </button>
-                <button onclick="closePaymentFailedModal(); handleCheckout();" class="submit-btn" style="flex: 1; background: linear-gradient(135deg, var(--primary-gold) 0%, var(--secondary-gold) 100%);">
-                    <i class="fas fa-redo"></i>
-                    <span>Try Again</span>
+                <button onclick="closePaymentFailedModal(); handleCheckout();" style="flex: 1; background: linear-gradient(135deg, #D4AF37 0%, #B8962E 100%); border: none; border-radius: 25px; padding: 14px 20px; color: #1a1a1a; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);">
+                    <i class="fas fa-redo" style="color: #1a1a1a;"></i>
+                    <span style="color: #1a1a1a;">Try Again</span>
                 </button>
             </div>
         </div>
