@@ -42,10 +42,6 @@
                         </button>
                     </div>
                 </div>
-                <div class="demo-credentials">
-                    <p><i class="fas fa-info-circle"></i> Demo credentials:</p>
-                    <p>Email: <strong>admin@currycrave.com</strong> | Password: <strong>admin123</strong></p>
-                </div>
                 <button type="submit" class="login-btn">
                     <i class="fas fa-sign-in-alt"></i>
                     Login to Dashboard
@@ -92,6 +88,11 @@
                 <a href="#" class="nav-item" data-page="analytics">
                     <i class="fas fa-chart-pie"></i>
                     <span>Analytics</span>
+                </a>
+                <a href="#" class="nav-item" data-page="feedback">
+                    <i class="fas fa-comments"></i>
+                    <span>Feedback</span>
+                    <span class="badge" id="feedbackBadge" style="display: none;">0</span>
                 </a>
                 <a href="#" class="nav-item" data-page="settings">
                     <i class="fas fa-cog"></i>
@@ -349,6 +350,88 @@
                         <canvas id="orderStatusChart"></canvas>
                     </div>
                 </div>
+            </div>
+
+            <!-- Feedback Page -->
+            <div class="page-content" id="feedbackPage" style="display: none;">
+                <div class="page-header">
+                    <h2>Customer Feedback</h2>
+                    <div class="header-actions">
+                        <select class="filter-select" id="feedbackStatusFilter"
+                            onchange="filterFeedbackByStatus(this.value)">
+                            <option value="all">All Feedback</option>
+                            <option value="new">New</option>
+                            <option value="read">Read</option>
+                            <option value="replied">Replied</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                        <button class="export-btn" onclick="refreshFeedback()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feedback Stats -->
+                <div class="stats-grid" style="margin-bottom: 20px;">
+                    <div class="stat-card" style="cursor: pointer;" onclick="filterFeedbackByStatus('new')">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>New</h3>
+                            <p class="stat-value" id="feedbackNewCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor: pointer;" onclick="filterFeedbackByStatus('read')">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                            <i class="fas fa-envelope-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Read</h3>
+                            <p class="stat-value" id="feedbackReadCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor: pointer;" onclick="filterFeedbackByStatus('replied')">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                            <i class="fas fa-reply"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Replied</h3>
+                            <p class="stat-value" id="feedbackRepliedCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="cursor: pointer;" onclick="filterFeedbackByStatus('resolved')">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Resolved</h3>
+                            <p class="stat-value" id="feedbackResolvedCount">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Table -->
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedbackTableBody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Container -->
+                <div id="feedbackPagination"></div>
             </div>
 
             <!-- Settings Page -->
@@ -845,6 +928,35 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Feedback Details Modal -->
+    <div class="modal" id="feedbackDetailsModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Feedback Details</h3>
+                <button class="close-modal" id="closeFeedbackModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="feedback-details-body" id="feedbackDetailsBody">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions" style="margin-top: 20px;">
+                <select id="feedbackStatusSelect" class="filter-select" style="flex: 1;">
+                    <option value="new">New</option>
+                    <option value="read">Read</option>
+                    <option value="replied">Replied</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+                <button type="button" class="submit-btn" onclick="updateCurrentFeedbackStatus()">
+                    <i class="fas fa-check"></i> Update Status
+                </button>
+                <button type="button" class="delete-btn" onclick="deleteCurrentFeedback()" style="background: #e74c3c;">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
         </div>
     </div>
 

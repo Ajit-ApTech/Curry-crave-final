@@ -115,7 +115,7 @@ adminLoginForm?.addEventListener('submit', async function (e) {
             return;
         }
 
-        showToast('Connection error. Use admin@currycrave.com / admin123 to test.', 'error');
+        showToast('Connection error. Please try again later.', 'error');
     }
 });
 
@@ -391,6 +391,9 @@ function showPage(pageName) {
             break;
         case 'analytics':
             loadAnalyticsData();
+            break;
+        case 'feedback':
+            loadFeedbackData();
             break;
         case 'settings':
             loadSettingsData();
@@ -2749,3 +2752,379 @@ window.addRestaurantLocation = addRestaurantLocation;
 window.removeRestaurantLocation = removeRestaurantLocation;
 window.toggleRestaurantLocation = toggleRestaurantLocation;
 window.saveDeliveryRadius = saveDeliveryRadius;
+
+// ===== FEEDBACK MANAGEMENT =====
+let currentFeedbackStatus = 'all';
+let currentFeedbackId = null;
+
+// Load feedback data
+async function loadFeedbackData() {
+    const tableBody = document.getElementById('feedbackTableBody');
+    if (!tableBody) return;
+
+    try {
+        // Show loading state
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--primary-gold);"></i>
+                    <p style="margin-top: 15px; color: var(--light-gold);">Loading feedback...</p>
+                </td>
+            </tr>
+        `;
+
+        // Build URL with status filter if set
+        let apiUrl = `${API_URL}/feedback/admin/all`;
+        if (currentFeedbackStatus && currentFeedbackStatus !== 'all') {
+            apiUrl += `?status=${currentFeedbackStatus}`;
+        }
+
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.message || 'Failed to load feedback');
+        }
+
+        const feedbackList = result.data || [];
+
+        // Update counts
+        if (result.counts) {
+            document.getElementById('feedbackNewCount').textContent = result.counts.new || 0;
+            document.getElementById('feedbackReadCount').textContent = result.counts.read || 0;
+            document.getElementById('feedbackRepliedCount').textContent = result.counts.replied || 0;
+            document.getElementById('feedbackResolvedCount').textContent = result.counts.resolved || 0;
+
+            // Update badge
+            const badge = document.getElementById('feedbackBadge');
+            if (badge && result.counts.new > 0) {
+                badge.textContent = result.counts.new;
+                badge.style.display = 'inline-block';
+            } else if (badge) {
+                badge.style.display = 'none';
+            }
+        }
+
+        if (feedbackList.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 60px;">
+                        <i class="fas fa-comments" style="font-size: 64px; color: var(--light-gold); opacity: 0.3;"></i>
+                        <h3 style="color: var(--cream); margin-top: 20px;">No feedback found</h3>
+                        <p style="color: var(--light-gold); margin-top: 10px;">Customer feedback will appear here</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Render feedback table
+        tableBody.innerHTML = feedbackList.map(feedback => {
+            const date = new Date(feedback.createdAt).toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const statusColors = {
+                new: '#e74c3c',
+                read: '#3498db',
+                replied: '#9b59b6',
+                resolved: '#27ae60'
+            };
+
+            const truncatedMessage = feedback.message.length > 50
+                ? feedback.message.substring(0, 50) + '...'
+                : feedback.message;
+
+            return `
+                <tr style="${feedback.status === 'new' ? 'background: rgba(231, 76, 60, 0.1);' : ''}">
+                    <td style="white-space: nowrap;">${date}</td>
+                    <td><strong style="color: var(--cream);">${feedback.name}</strong></td>
+                    <td style="color: var(--light-gold);">${feedback.email}</td>
+                    <td style="color: var(--light-gold);">${feedback.phone}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${feedback.message}">${truncatedMessage}</td>
+                    <td>
+                        <span class="status-badge" style="background: ${statusColors[feedback.status]}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; text-transform: capitalize;">
+                            ${feedback.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="view-btn" onclick="viewFeedback('${feedback._id}')" style="padding: 6px 12px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Error loading feedback:', error);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 60px;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 64px; color: #e74c3c; margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--cream); margin-bottom: 10px;">Failed to Load Feedback</h3>
+                    <p style="color: var(--light-gold); margin-bottom: 20px;">Unable to connect to the server.</p>
+                    <button class="view-btn" onclick="loadFeedbackData()">
+                        <i class="fas fa-redo"></i> Retry
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// View feedback details
+async function viewFeedback(feedbackId) {
+    const modal = document.getElementById('feedbackDetailsModal');
+    const body = document.getElementById('feedbackDetailsBody');
+
+    if (!modal || !body) return;
+
+    currentFeedbackId = feedbackId;
+
+    try {
+        // Show loading
+        body.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--primary-gold);"></i>
+            </div>
+        `;
+        modal.style.display = 'flex';
+
+        const response = await fetch(`${API_URL}/feedback/admin/${feedbackId}`, {
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.message || 'Failed to load feedback');
+        }
+
+        const feedback = result.data;
+
+        const date = new Date(feedback.createdAt).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Set status dropdown
+        const statusSelect = document.getElementById('feedbackStatusSelect');
+        if (statusSelect) {
+            statusSelect.value = feedback.status;
+        }
+
+        body.innerHTML = `
+            <div style="background: rgba(212, 175, 55, 0.05); border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <label style="color: var(--light-gold); font-size: 12px; text-transform: uppercase;">Name</label>
+                        <p style="color: var(--cream); font-size: 16px; font-weight: 600; margin-top: 5px;">${feedback.name}</p>
+                    </div>
+                    <div>
+                        <label style="color: var(--light-gold); font-size: 12px; text-transform: uppercase;">Date</label>
+                        <p style="color: var(--cream); font-size: 16px; margin-top: 5px;">${date}</p>
+                    </div>
+                    <div>
+                        <label style="color: var(--light-gold); font-size: 12px; text-transform: uppercase;">Email</label>
+                        <p style="margin-top: 5px;"><a href="mailto:${feedback.email}" style="color: var(--primary-gold);">${feedback.email}</a></p>
+                    </div>
+                    <div>
+                        <label style="color: var(--light-gold); font-size: 12px; text-transform: uppercase;">Phone</label>
+                        <p style="margin-top: 5px;"><a href="tel:${feedback.phone}" style="color: var(--primary-gold);">${feedback.phone}</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 20px;">
+                <label style="color: var(--light-gold); font-size: 12px; text-transform: uppercase; display: block; margin-bottom: 10px;">
+                    <i class="fas fa-comment-alt"></i> Message
+                </label>
+                <p style="color: var(--cream); line-height: 1.6; white-space: pre-wrap;">${feedback.message}</p>
+            </div>
+
+            ${feedback.adminReply ? `
+                <div style="background: rgba(39, 174, 96, 0.1); border: 1px solid rgba(39, 174, 96, 0.3); border-radius: 10px; padding: 20px; margin-top: 15px;">
+                    <label style="color: #27ae60; font-size: 12px; text-transform: uppercase; display: block; margin-bottom: 10px;">
+                        <i class="fas fa-reply"></i> Your Reply (${new Date(feedback.repliedAt).toLocaleDateString('en-IN')})
+                    </label>
+                    <p style="color: var(--cream); line-height: 1.6; white-space: pre-wrap;">${feedback.adminReply}</p>
+                </div>
+            ` : ''}
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <a href="mailto:${feedback.email}?subject=Re: Your Feedback to Curry Crave" 
+                   class="submit-btn" style="text-decoration: none; text-align: center; flex: 1;">
+                    <i class="fas fa-envelope"></i> Reply via Email
+                </a>
+                <a href="https://wa.me/${feedback.phone.replace(/[^0-9]/g, '')}?text=Hi ${feedback.name}, thank you for your feedback!" 
+                   class="submit-btn" style="background: #25D366; text-decoration: none; text-align: center; flex: 1;" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Reply via WhatsApp
+                </a>
+            </div>
+        `;
+
+        // Refresh the list to update status
+        loadFeedbackData();
+
+    } catch (error) {
+        console.error('Error viewing feedback:', error);
+        body.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                <i class="fas fa-exclamation-circle" style="font-size: 48px;"></i>
+                <p style="margin-top: 15px;">Failed to load feedback details</p>
+            </div>
+        `;
+    }
+}
+
+// Filter feedback by status
+function filterFeedbackByStatus(status) {
+    currentFeedbackStatus = status;
+
+    // Update dropdown
+    const filterSelect = document.getElementById('feedbackStatusFilter');
+    if (filterSelect) {
+        filterSelect.value = status;
+    }
+
+    loadFeedbackData();
+}
+
+// Update current feedback status
+async function updateCurrentFeedbackStatus() {
+    if (!currentFeedbackId) return;
+
+    const statusSelect = document.getElementById('feedbackStatusSelect');
+    const newStatus = statusSelect?.value;
+
+    if (!newStatus) return;
+
+    try {
+        const response = await fetch(`${API_URL}/feedback/admin/${currentFeedbackId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAuthToken()}`
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast(`Status updated to "${newStatus}"`);
+            loadFeedbackData();
+            closeFeedbackModal();
+        } else {
+            throw new Error(result.message || 'Failed to update status');
+        }
+    } catch (error) {
+        console.error('Error updating status:', error);
+        showToast('Failed to update status', 'error');
+    }
+}
+
+// Delete current feedback
+async function deleteCurrentFeedback() {
+    if (!currentFeedbackId) return;
+
+    if (!confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/feedback/admin/${currentFeedbackId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Feedback deleted successfully');
+            loadFeedbackData();
+            closeFeedbackModal();
+        } else {
+            throw new Error(result.message || 'Failed to delete feedback');
+        }
+    } catch (error) {
+        console.error('Error deleting feedback:', error);
+        showToast('Failed to delete feedback', 'error');
+    }
+}
+
+// Close feedback modal
+function closeFeedbackModal() {
+    const modal = document.getElementById('feedbackDetailsModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    currentFeedbackId = null;
+}
+
+// Refresh feedback
+function refreshFeedback() {
+    loadFeedbackData();
+    showToast('Feedback refreshed');
+}
+
+// Setup feedback modal close button
+document.getElementById('closeFeedbackModal')?.addEventListener('click', closeFeedbackModal);
+
+// Close modal on outside click
+document.getElementById('feedbackDetailsModal')?.addEventListener('click', function (e) {
+    if (e.target === this) {
+        closeFeedbackModal();
+    }
+});
+
+// Check for new feedback periodically
+function checkNewFeedback() {
+    fetch(`${API_URL}/feedback/admin/count/new`, {
+        headers: {
+            'Authorization': `Bearer ${getAuthToken()}`
+        }
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                const badge = document.getElementById('feedbackBadge');
+                if (badge && result.count > 0) {
+                    badge.textContent = result.count;
+                    badge.style.display = 'inline-block';
+                } else if (badge) {
+                    badge.style.display = 'none';
+                }
+            }
+        })
+        .catch(err => console.log('Error checking new feedback:', err));
+}
+
+// Check for new feedback every 30 seconds
+setInterval(checkNewFeedback, 30000);
+
+// Make feedback functions globally accessible
+window.loadFeedbackData = loadFeedbackData;
+window.viewFeedback = viewFeedback;
+window.filterFeedbackByStatus = filterFeedbackByStatus;
+window.updateCurrentFeedbackStatus = updateCurrentFeedbackStatus;
+window.deleteCurrentFeedback = deleteCurrentFeedback;
+window.refreshFeedback = refreshFeedback;
+window.closeFeedbackModal = closeFeedbackModal;

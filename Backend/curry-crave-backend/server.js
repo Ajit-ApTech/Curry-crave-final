@@ -16,6 +16,7 @@ import paymentRoutes from './routes/payment.js';
 import adminRoutes from './routes/admin.js';
 import settingsRoutes from './routes/settings.js';
 import deliveryRoutes from './routes/delivery.js';
+import feedbackRoutes from './routes/feedback.js';
 
 // Connect to MongoDB and create admin user
 const initializeServer = async () => {
@@ -91,6 +92,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/delivery', deliveryRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Test Route
 app.get('/', (req, res) => {
