@@ -832,26 +832,112 @@ async function processRazorpayPayment(orderData) {
                 color: '#D4AF37'
             },
             modal: {
-                ondismiss: function () {
-                    if (typeof window.showToast === 'function') {
-                        window.showToast('Payment cancelled');
+                ondismiss: async function () {
+                    // Payment was cancelled by user - cancel the order
+                    console.log('Payment cancelled by user, cancelling order:', orderId);
+                    try {
+                        await fetch(`${getApiUrl()}/order/${orderId}/cancel`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+                    } catch (cancelError) {
+                        console.error('Error cancelling order:', cancelError);
                     }
+
+                    // Show payment failed modal
+                    showPaymentFailedModal('Payment was cancelled. Your order has been cancelled.');
                 }
             }
         };
 
         const razorpay = new Razorpay(options);
+
+        // Handle payment failure
+        razorpay.on('payment.failed', async function (response) {
+            console.log('Payment failed:', response.error);
+
+            // Cancel the order in backend
+            try {
+                await fetch(`${getApiUrl()}/payment/failed`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        error: response.error.description || 'Payment failed'
+                    })
+                });
+            } catch (failError) {
+                console.error('Error marking payment as failed:', failError);
+            }
+
+            // Show payment failed modal
+            showPaymentFailedModal(response.error.description || 'Payment failed. Please try again.');
+        });
+
         razorpay.open();
 
     } catch (error) {
         console.error('Razorpay payment error:', error);
-        if (typeof window.showToast === 'function') {
-            // Show specific error message if available
-            const errorMsg = error.message || 'Payment initialization failed. Please try again.';
-            window.showToast(errorMsg, 'error');
-        }
+        // Show payment failed modal instead of just a toast
+        showPaymentFailedModal(error.message || 'Payment initialization failed. Please try again.');
     }
 }
+
+// ===== SHOW PAYMENT FAILED MODAL =====
+function showPaymentFailedModal(errorMessage) {
+    // Remove any existing modal
+    const existingModal = document.getElementById('paymentFailedModal');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'paymentFailedModal';
+    modal.className = 'login-modal active';
+    modal.innerHTML = `
+        <div class="modal-overlay"></div>
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, rgba(255, 50, 50, 0.2) 0%, rgba(255, 50, 50, 0.1) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-times-circle" style="font-size: 40px; color: #ff6b6b;"></i>
+            </div>
+            <h2 class="modal-title" style="color: #ff6b6b;">Payment Failed</h2>
+            <p style="color: var(--light-gold); margin: 20px 0; font-size: 15px;">
+                ${errorMessage}
+            </p>
+            <div style="background: rgba(255, 50, 50, 0.1); border: 1px solid rgba(255, 50, 50, 0.3); border-radius: 12px; padding: 15px; margin: 20px 0;">
+                <p style="color: var(--cream-white); font-size: 14px; margin: 0;">
+                    <i class="fas fa-info-circle" style="color: #ff6b6b; margin-right: 8px;"></i>
+                    Your order was not placed. No amount has been deducted.
+                </p>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 25px;">
+                <button onclick="closePaymentFailedModal()" class="submit-btn" style="flex: 1; background: rgba(100, 100, 100, 0.3); border: 1px solid rgba(150, 150, 150, 0.5);">
+                    <i class="fas fa-times"></i>
+                    <span>Close</span>
+                </button>
+                <button onclick="closePaymentFailedModal(); handleCheckout();" class="submit-btn" style="flex: 1; background: linear-gradient(135deg, var(--primary-gold) 0%, var(--secondary-gold) 100%);">
+                    <i class="fas fa-redo"></i>
+                    <span>Try Again</span>
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+function closePaymentFailedModal() {
+    const modal = document.getElementById('paymentFailedModal');
+    if (modal) modal.remove();
+}
+
+// Make functions global
+window.showPaymentFailedModal = showPaymentFailedModal;
+window.closePaymentFailedModal = closePaymentFailedModal;
 
 // ===== LOAD RAZORPAY SCRIPT =====
 function loadRazorpayScript() {
